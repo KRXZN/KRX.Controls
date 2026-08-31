@@ -53,7 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Leaf.CvCommon" Version="1.0.5" />
+    <ProjectReference Include="..\..\..\KRX.CvLibrary\src\CvCommon\CvCommon.csproj" />
   </ItemGroup>
 
   <ItemGroup>

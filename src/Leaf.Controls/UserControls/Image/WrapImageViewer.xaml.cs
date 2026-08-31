@@ -88,7 +88,6 @@ namespace Leaf.Controls.UserControls
         #endregion
 
 
-
         #region 依赖属性
         public static readonly DependencyProperty ImageSourceProperty = DependencyProperty.Register(
             nameof(ImageSource),
@@ -217,22 +216,13 @@ namespace Leaf.Controls.UserControls
                 new PropertyMetadata(false)
             );
 
-        public static readonly DependencyProperty SingleModeOnlyProperty =
+        public static readonly DependencyProperty AutoFitWhenSourceChangedProperty =
             DependencyProperty.Register(
-                nameof(SingleModeOnly),
+                nameof(AutoFitWhenSourceChanged),
                 typeof(bool),
                 typeof(WrapImageViewer),
-                new PropertyMetadata(false, OnSingleModeOnlyChanged)
+                new PropertyMetadata(false)
             );
-
-        private static void OnSingleModeOnlyChanged(
-            DependencyObject d,
-            DependencyPropertyChangedEventArgs e
-        )
-        {
-            throw new NotImplementedException();
-        }
-
         // 属性访问器
         public BitmapFrame? ImageSource
         {
@@ -331,10 +321,10 @@ namespace Leaf.Controls.UserControls
             get => (bool)GetValue(HasSelectedROIProperty);
             set => SetValue(HasSelectedROIProperty, value);
         }
-        public bool SingleModeOnly
+        public bool AutoFitWhenSourceChanged
         {
-            get { return (bool)GetValue(SingleModeOnlyProperty); }
-            set { SetValue(SingleModeOnlyProperty, value); }
+            get { return (bool)GetValue(AutoFitWhenSourceChangedProperty); }
+            set { SetValue(AutoFitWhenSourceChangedProperty, value); }
         }
 
         #endregion
@@ -743,7 +733,7 @@ namespace Leaf.Controls.UserControls
                         {
                             SelectedROI = _previewRoi;
                             Mode = InteractionMode.Edit;
-                            SelectedROI.IsEditing = true;   
+                            SelectedROI.IsEditing = true;
                             ROIManipulationCommand?.Execute(SelectedROI);
                         }
                     }
@@ -854,6 +844,10 @@ namespace Leaf.Controls.UserControls
         private void Init()
         {
             UpdateImageWithCurrentScale();
+            if(AutoFitWhenSourceChanged)
+            {
+                FitImageToView();
+            }
         }
 
         private void UpdateImageWithCurrentScale()
@@ -899,14 +893,11 @@ namespace Leaf.Controls.UserControls
             {
                 var imgWidHeiScale = width / height;
                 var winWidHeiScale = ActualWidth / ActualHeight;
-                ImageScale = 1;
-
                 if (imgWidHeiScale > winWidHeiScale)
                 {
-                    if (width > ActualWidth)
-                        ImageScale = ActualWidth / width;
+                    ImageScale = ActualWidth / width;
                 }
-                else if (height > ActualHeight)
+                else
                 {
                     ImageScale = ActualHeight / height;
                 }
