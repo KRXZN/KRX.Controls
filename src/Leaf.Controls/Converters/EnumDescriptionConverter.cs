@@ -1,9 +1,15 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
+using System.Windows;
 using System.Windows.Data;
 
 namespace Leaf.Controls.Converters
 {
-    public class EnumDescriptionConverter:IValueConverter
+    /// <summary>
+    /// 枚举显示转换器：按 "Enum_{类型名}_{成员名}" 键查应用资源字典（支持多语言热切换），
+    /// 查不到时退回 <see cref="DescriptionAttribute"/>，再退回成员名。
+    /// 语言切换后需重新触发绑定（重开窗口/重选条目）才会取到新语言文本。
+    /// </summary>
+    public class EnumDescriptionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
@@ -15,6 +21,11 @@ namespace Leaf.Controls.Converters
             var name = Enum.GetName(type, value);
             if (name == null)
                 return string.Empty;
+
+            var localized = FindLocalized(type, name);
+            if (localized is not null)
+                return localized;
+
             var field = type.GetField(name);
             if (field == null)
                 return string.Empty;
@@ -26,6 +37,7 @@ namespace Leaf.Controls.Converters
             }
             return name;
         }
+
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value == null || !targetType.IsEnum)
@@ -40,6 +52,12 @@ namespace Leaf.Controls.Converters
             {
                 if (field.IsSpecialName)
                     continue;
+
+                // 当前语言下的资源文本
+                if (FindLocalized(targetType, field.Name) == description)
+                {
+                    return Enum.Parse(targetType, field.Name);
+                }
 
                 var attrs = field.GetCustomAttributes(typeof(DescriptionAttribute), false);
                 if (attrs.Length > 0)
@@ -58,6 +76,13 @@ namespace Leaf.Controls.Converters
             }
 
             return Binding.DoNothing;
+        }
+
+        /// <summary>按 "Enum_{类型名}_{成员名}" 查应用资源字典；未定义该键时返回 null。</summary>
+        private static string? FindLocalized(Type enumType, string fieldName)
+        {
+            var key = $"Enum_{enumType.Name}_{fieldName}";
+            return Application.Current?.TryFindResource(key) as string;
         }
     }
 }

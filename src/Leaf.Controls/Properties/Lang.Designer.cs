@@ -95,5 +95,95 @@ namespace Leaf.Controls.Properties {
                 return ResourceManager.GetString("Button_Yes", resourceCulture);
             }
         }
+
+        internal static string ImageViewer_SelectMode {
+            get {
+                return ResourceManager.GetString("ImageViewer_SelectMode", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_SelectModeTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_SelectModeTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_PanMode {
+            get {
+                return ResourceManager.GetString("ImageViewer_PanMode", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_PanModeTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_PanModeTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_DrawRoi {
+            get {
+                return ResourceManager.GetString("ImageViewer_DrawRoi", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_DrawRoiTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_DrawRoiTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_EditRoi {
+            get {
+                return ResourceManager.GetString("ImageViewer_EditRoi", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_EditRoiTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_EditRoiTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_DeleteRoi {
+            get {
+                return ResourceManager.GetString("ImageViewer_DeleteRoi", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_DeleteRoiTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_DeleteRoiTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_ClearRois {
+            get {
+                return ResourceManager.GetString("ImageViewer_ClearRois", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_ClearRoisTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_ClearRoisTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_FitToView {
+            get {
+                return ResourceManager.GetString("ImageViewer_FitToView", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_FitToViewTip {
+            get {
+                return ResourceManager.GetString("ImageViewer_FitToViewTip", resourceCulture);
+            }
+        }
+
+        internal static string ImageViewer_AdjustRoiPosition {
+            get {
+                return ResourceManager.GetString("ImageViewer_AdjustRoiPosition", resourceCulture);
+            }
+        }
     }
 }

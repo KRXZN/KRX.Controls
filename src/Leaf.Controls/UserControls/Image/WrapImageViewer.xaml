@@ -122,6 +122,7 @@
                     Content="复原视窗"
                     ToolTip="图像适应窗口" />
                 <Button
+                    x:Name="AdjustROIPositionButton"
                     leaf:IconElement.DrawingIcon="{StaticResource TotalMoveIcon}"
                     Click="AdjustROIPosition_Click"
                     Content="位置调整" />

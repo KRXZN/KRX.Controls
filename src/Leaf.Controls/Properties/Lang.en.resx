@@ -129,4 +129,49 @@
   <data name="Button_Yes" xml:space="preserve">
     <value>Yes</value>
   </data>
+  <data name="ImageViewer_SelectMode" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="ImageViewer_SelectModeTip" xml:space="preserve">
+    <value>Select mode</value>
+  </data>
+  <data name="ImageViewer_PanMode" xml:space="preserve">
+    <value>Pan</value>
+  </data>
+  <data name="ImageViewer_PanModeTip" xml:space="preserve">
+    <value>Image pan mode</value>
+  </data>
+  <data name="ImageViewer_DrawRoi" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ImageViewer_DrawRoiTip" xml:space="preserve">
+    <value>Draw ROI mode</value>
+  </data>
+  <data name="ImageViewer_EditRoi" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="ImageViewer_EditRoiTip" xml:space="preserve">
+    <value>Edit ROI mode</value>
+  </data>
+  <data name="ImageViewer_DeleteRoi" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="ImageViewer_DeleteRoiTip" xml:space="preserve">
+    <value>Delete selected ROI</value>
+  </data>
+  <data name="ImageViewer_ClearRois" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="ImageViewer_ClearRoisTip" xml:space="preserve">
+    <value>Delete all ROIs</value>
+  </data>
+  <data name="ImageViewer_FitToView" xml:space="preserve">
+    <value>Fit to View</value>
+  </data>
+  <data name="ImageViewer_FitToViewTip" xml:space="preserve">
+    <value>Fit image to window</value>
+  </data>
+  <data name="ImageViewer_AdjustRoiPosition" xml:space="preserve">
+    <value>Adjust Position</value>
+  </data>
 </root>

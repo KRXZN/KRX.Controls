@@ -129,4 +129,49 @@
   <data name="Button_Yes" xml:space="preserve">
     <value>是</value>
   </data>
+  <data name="ImageViewer_SelectMode" xml:space="preserve">
+    <value>选中</value>
+  </data>
+  <data name="ImageViewer_SelectModeTip" xml:space="preserve">
+    <value>选中模式</value>
+  </data>
+  <data name="ImageViewer_PanMode" xml:space="preserve">
+    <value>拖拽</value>
+  </data>
+  <data name="ImageViewer_PanModeTip" xml:space="preserve">
+    <value>图像拖拽模式</value>
+  </data>
+  <data name="ImageViewer_DrawRoi" xml:space="preserve">
+    <value>新建</value>
+  </data>
+  <data name="ImageViewer_DrawRoiTip" xml:space="preserve">
+    <value>绘制ROI模式</value>
+  </data>
+  <data name="ImageViewer_EditRoi" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="ImageViewer_EditRoiTip" xml:space="preserve">
+    <value>编辑ROI模式</value>
+  </data>
+  <data name="ImageViewer_DeleteRoi" xml:space="preserve">
+    <value>删除</value>
+  </data>
+  <data name="ImageViewer_DeleteRoiTip" xml:space="preserve">
+    <value>删除选中ROI</value>
+  </data>
+  <data name="ImageViewer_ClearRois" xml:space="preserve">
+    <value>清空</value>
+  </data>
+  <data name="ImageViewer_ClearRoisTip" xml:space="preserve">
+    <value>删除所有ROI</value>
+  </data>
+  <data name="ImageViewer_FitToView" xml:space="preserve">
+    <value>复原视窗</value>
+  </data>
+  <data name="ImageViewer_FitToViewTip" xml:space="preserve">
+    <value>图像适应窗口</value>
+  </data>
+  <data name="ImageViewer_AdjustRoiPosition" xml:space="preserve">
+    <value>位置调整</value>
+  </data>
 </root>

@@ -10,6 +10,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using CvCommon;
 using Leaf.Controls.CustomControls;
+using Leaf.Controls.Properties;
 using Leaf.Controls.UserControls.Image;
 using Leaf.Controls.UserControls.Image.Shape;
 
@@ -69,6 +70,41 @@ namespace Leaf.Controls.UserControls
 
             // 更新按钮状态
             UpdateModeButtons();
+
+            // 工具栏文本按当前语言取值
+            ApplyLocalizedToolbarText();
+        }
+
+        /// <summary>
+        /// 工具栏按钮文本按当前语言（Properties.Lang 资源）刷新；
+        /// 资源缺失时保留 XAML 中的默认文本。
+        /// </summary>
+        private void ApplyLocalizedToolbarText()
+        {
+            ApplyText(ClickModeButton, Lang.ImageViewer_SelectMode, Lang.ImageViewer_SelectModeTip);
+            ApplyText(PanModeButton, Lang.ImageViewer_PanMode, Lang.ImageViewer_PanModeTip);
+            ApplyText(DrawROIModeButton, Lang.ImageViewer_DrawRoi, Lang.ImageViewer_DrawRoiTip);
+            ApplyText(EditModeButton, Lang.ImageViewer_EditRoi, Lang.ImageViewer_EditRoiTip);
+            ApplyText(
+                DeleteSelectedROIButton,
+                Lang.ImageViewer_DeleteRoi,
+                Lang.ImageViewer_DeleteRoiTip
+            );
+            ApplyText(ClearROIsButton, Lang.ImageViewer_ClearRois, Lang.ImageViewer_ClearRoisTip);
+            ApplyText(FitToViewButton, Lang.ImageViewer_FitToView, Lang.ImageViewer_FitToViewTip);
+            ApplyText(AdjustROIPositionButton, Lang.ImageViewer_AdjustRoiPosition);
+        }
+
+        private static void ApplyText(ContentControl button, string? content, string? toolTip = null)
+        {
+            if (!string.IsNullOrEmpty(content))
+            {
+                button.Content = content;
+            }
+            if (!string.IsNullOrEmpty(toolTip))
+            {
+                button.ToolTip = toolTip;
+            }
         }
 
         /// <summary>
