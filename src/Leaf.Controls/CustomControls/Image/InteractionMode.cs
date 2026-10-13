@@ -20,6 +20,11 @@
         /// <summary>
         /// 选择ROI模式
         /// </summary>
-        Select
+        Select,
+
+        /// <summary>
+        /// 取色模式：左键点击图像取该点像素，通过 PixelPickedCommand 回传原图坐标
+        /// </summary>
+        PickColor
     }
 }

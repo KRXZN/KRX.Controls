@@ -169,6 +169,14 @@ namespace Leaf.Controls.UserControls
                 new PropertyMetadata(null)
             );
 
+        public static readonly DependencyProperty PixelPickedCommandProperty =
+            DependencyProperty.Register(
+                nameof(PixelPickedCommand),
+                typeof(ICommand),
+                typeof(WrapImageViewer),
+                new PropertyMetadata(null)
+            );
+
         public static readonly DependencyProperty ShowToolbarProperty = DependencyProperty.Register(
             nameof(ShowToolbar),
             typeof(bool),
@@ -292,6 +300,16 @@ namespace Leaf.Controls.UserControls
         {
             get { return (ICommand?)GetValue(ROIAdjustCommandProperty); }
             set { SetValue(ROIAdjustCommandProperty, value); }
+        }
+
+        /// <summary>
+        /// 取色模式（<see cref="InteractionMode.PickColor"/>）下左键点击图像时执行，
+        /// 参数为点击位置的原图像素坐标（CvPoint）。
+        /// </summary>
+        public ICommand? PixelPickedCommand
+        {
+            get { return (ICommand?)GetValue(PixelPickedCommandProperty); }
+            set { SetValue(PixelPickedCommandProperty, value); }
         }
 
         public bool ShowToolbar
@@ -510,15 +528,26 @@ namespace Leaf.Controls.UserControls
             {
                 SelectedROI.IsEditing = false;
             }
-            if (newMode != InteractionMode.Select && SelectedROI != null)
+            // 取色模式视同选中模式：保留当前选中 ROI，便于操作员对照取色范围
+            if (
+                newMode != InteractionMode.Select
+                && newMode != InteractionMode.PickColor
+                && SelectedROI != null
+            )
             {
                 SelectedROI.IsSelected = false;
             }
-            if (newMode != InteractionMode.Edit && newMode != InteractionMode.Select)
+            if (
+                newMode != InteractionMode.Edit
+                && newMode != InteractionMode.Select
+                && newMode != InteractionMode.PickColor
+            )
             {
                 SelectedROI = null;
                 HasSelectedROI = false;
             }
+
+            Cursor = newMode == InteractionMode.PickColor ? Cursors.Cross : Cursors.Arrow;
 
             UpdateModeButtons();
         }
@@ -713,6 +742,19 @@ namespace Leaf.Controls.UserControls
                             SelectedROI = null;
                             HasSelectedROI = false;
                         }
+                    }
+                    break;
+                case InteractionMode.PickColor:
+                    // 显示坐标 → 原图像素坐标（面板坐标系按缩放比还原）
+                    if (_imgActualScale > 0)
+                    {
+                        var pickPoint = e.GetPosition(_mainPanel);
+                        PixelPickedCommand?.Execute(
+                            new CvPoint(
+                                pickPoint.X / _imgActualScale,
+                                pickPoint.Y / _imgActualScale
+                            )
+                        );
                     }
                     break;
                 case InteractionMode.Select:
