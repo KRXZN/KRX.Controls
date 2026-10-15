@@ -88,22 +88,22 @@
             Orientation="Horizontal">
             <Button
                 x:Name="ButtonConfirm"
-                Width="50"
+                MinWidth="50"
                 Click="ButtonConfirm_Click"
                 Content="确定" />
             <Button
                 x:Name="ButtonYes"
-                Width="50"
+                MinWidth="50"
                 Click="ButtonYes_Click"
                 Content="是" />
             <Button
                 x:Name="ButtonNo"
-                Width="50"
+                MinWidth="50"
                 Click="ButtonNo_Click"
                 Content="否" />
             <Button
                 x:Name="ButtonCancel"
-                Width="50"
+                MinWidth="50"
                 Click="ButtonCancel_Click"
                 Content="取消"
                 Visibility="Collapsed" />
