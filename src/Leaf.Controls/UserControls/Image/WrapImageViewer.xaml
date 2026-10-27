@@ -113,6 +113,7 @@
                     leaf:IconElement.DrawingIcon="{StaticResource DeleteIcon}"
                     Click="ClearROIsButton_Click"
                     Content="清空"
+                    IsEnabled="{Binding ShowROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}"
                     ToolTip="删除所有ROI" />
                 <!--  Fit to view button  -->
                 <Button
@@ -125,7 +126,8 @@
                     x:Name="AdjustROIPositionButton"
                     leaf:IconElement.DrawingIcon="{StaticResource TotalMoveIcon}"
                     Click="AdjustROIPosition_Click"
-                    Content="位置调整" />
+                    Content="位置调整"
+                    IsEnabled="{Binding ShowROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}" />
             </StackPanel>
         </Border>
 
@@ -153,7 +155,9 @@
                     Source="{Binding ImageSource, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}" />
 
                 <!--  ROI rendering layer  -->
-                <ItemsControl ItemsSource="{Binding ROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}">
+                <ItemsControl
+                    ItemsSource="{Binding ROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}"
+                    Visibility="{Binding ShowROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
@@ -336,6 +340,57 @@
                                         Style="{StaticResource ResizeThumbStyle}"
                                         Tag="BottomRight" />
                                 </leaf:SimplePanel>
+                            </leaf:SimplePanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!--  只读结果覆盖层：显示在编辑层之上，不参与鼠标交互  -->
+                <ItemsControl
+                    IsHitTestVisible="False"
+                    ItemsSource="{Binding OverlayROIs, RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="Canvas.Left" Value="{Binding Rect.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Rect.Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type leaf:ROI}">
+                            <leaf:SimplePanel Width="{Binding Rect.Width}" Height="{Binding Rect.Height}">
+                                <TextBlock
+                                    Margin="-20"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}, Path=CodeTextFontSize}"
+                                    Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:WrapImageViewer}, Path=CodeTextBrush}"
+                                    Text="{Binding Code}" />
+                                <Rectangle>
+                                    <Rectangle.Style>
+                                        <Style TargetType="Rectangle">
+                                            <Setter Property="Stroke" Value="Yellow" />
+                                            <Setter Property="StrokeThickness" Value="2" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAuxiliary}" Value="True">
+                                                    <Setter Property="Stroke" Value="Cyan" />
+                                                    <Setter Property="StrokeThickness" Value="1.5" />
+                                                    <Setter Property="StrokeDashArray" Value="3 2" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsOK}" Value="True">
+                                                    <Setter Property="Stroke" Value="Green" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsOK}" Value="False">
+                                                    <Setter Property="Stroke" Value="Red" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Rectangle.Style>
+                                </Rectangle>
                             </leaf:SimplePanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

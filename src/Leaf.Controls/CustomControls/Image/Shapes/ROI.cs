@@ -140,6 +140,17 @@ namespace Leaf.Controls.CustomControls
             set => SetField(ref _isOK, value);
         }
 
+        private bool _isAuxiliary;
+
+        /// <summary>
+        /// 是否辅助标记（如字符区）：只读结果覆盖层中显示为青色虚线。
+        /// </summary>
+        public bool IsAuxiliary
+        {
+            get => _isAuxiliary;
+            set => SetField(ref _isAuxiliary, value);
+        }
+
         private bool _showIndicator;
 
         /// <summary>

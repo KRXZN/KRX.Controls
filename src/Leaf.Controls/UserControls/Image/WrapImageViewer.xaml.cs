@@ -54,6 +54,7 @@ namespace Leaf.Controls.UserControls
             InitializeComponent();
 
             ROIs = [];
+            OverlayROIs = [];
 
             // 注册事件
             Loaded += WrapImageViewer_Loaded;
@@ -144,6 +145,21 @@ namespace Leaf.Controls.UserControls
             typeof(ObservableCollection<ROI>),
             typeof(WrapImageViewer),
             new PropertyMetadata(default(ObservableCollection<ROI>), OnROIsChanged)
+        );
+
+        public static readonly DependencyProperty OverlayROIsProperty =
+            DependencyProperty.Register(
+                nameof(OverlayROIs),
+                typeof(ObservableCollection<ROI>),
+                typeof(WrapImageViewer),
+                new PropertyMetadata(default(ObservableCollection<ROI>), OnOverlayROIsChanged)
+            );
+
+        public static readonly DependencyProperty ShowROIsProperty = DependencyProperty.Register(
+            nameof(ShowROIs),
+            typeof(bool),
+            typeof(WrapImageViewer),
+            new PropertyMetadata(true)
         );
 
         public static readonly DependencyProperty SelectedROIProperty = DependencyProperty.Register(
@@ -285,6 +301,25 @@ namespace Leaf.Controls.UserControls
             get => (ObservableCollection<ROI>)GetValue(ROIsProperty);
             set => SetValue(ROIsProperty, value);
         }
+
+        /// <summary>
+        /// 只读结果覆盖层：不参与鼠标交互，随图像缩放/平移同步。
+        /// </summary>
+        public ObservableCollection<ROI> OverlayROIs
+        {
+            get => (ObservableCollection<ROI>)GetValue(OverlayROIsProperty);
+            set => SetValue(OverlayROIsProperty, value);
+        }
+
+        /// <summary>
+        /// 是否显示可编辑 ROI 层；false 时仅显示结果覆盖层。
+        /// </summary>
+        public bool ShowROIs
+        {
+            get => (bool)GetValue(ShowROIsProperty);
+            set => SetValue(ShowROIsProperty, value);
+        }
+
         public ROI? SelectedROI
         {
             get => (ROI?)GetValue(SelectedROIProperty);
@@ -421,6 +456,8 @@ namespace Leaf.Controls.UserControls
 
         private void ClearROIsButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ShowROIs)
+                return;
             if (LeafNotificationBox.ShowYesNo("确定要清除所有ROI吗？") is true)
             {
                 ROIs.Clear();
@@ -431,6 +468,8 @@ namespace Leaf.Controls.UserControls
 
         private void DeleteSelectedROIButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ShowROIs)
+                return;
             if (SelectedROI != null)
             {
                 ROIs.Remove(SelectedROI);
@@ -441,6 +480,8 @@ namespace Leaf.Controls.UserControls
 
         private void AdjustROIPosition_Click(object sender, RoutedEventArgs e)
         {
+            if (!ShowROIs)
+                return;
             var adjustWindow = new ROIAdjustWindow
             {
                 MoveUp = (value) => MoveROis(-value, 0),
@@ -454,6 +495,8 @@ namespace Leaf.Controls.UserControls
 
         private void MoveROis(double updown, double leftright)
         {
+            if (!ShowROIs)
+                return;
             foreach (var roi in ROIs)
             {
                 var oldRect = roi.OriginalRect;
@@ -514,6 +557,14 @@ namespace Leaf.Controls.UserControls
 
         private void OnModeChanged(InteractionMode newMode)
         {
+            // 结果覆盖层只读：保留隐藏的编辑层选中状态，避免进入结果视图时丢失选中项
+            if (!ShowROIs)
+            {
+                Cursor = newMode == InteractionMode.PickColor ? Cursors.Cross : Cursors.Arrow;
+                UpdateModeButtons();
+                return;
+            }
+
             // 取消之前模式的状态
             if (newMode != InteractionMode.Pan && ROIs is not null)
             {
@@ -583,10 +634,55 @@ namespace Leaf.Controls.UserControls
             }
         }
 
+        private static void OnOverlayROIsChanged(
+            DependencyObject d,
+            DependencyPropertyChangedEventArgs e
+        )
+        {
+            var viewer = (WrapImageViewer)d;
+
+            if (e.OldValue is ObservableCollection<ROI> oldCollection)
+            {
+                oldCollection.CollectionChanged -= viewer.OverlayROIs_CollectionChanged;
+            }
+
+            if (e.NewValue is ObservableCollection<ROI> newCollection)
+            {
+                newCollection.CollectionChanged += viewer.OverlayROIs_CollectionChanged;
+                if (viewer._imgActualScale > 0)
+                {
+                    foreach (var roi in newCollection)
+                    {
+                        roi.UpdateScale(viewer._imgActualScale);
+                    }
+                }
+            }
+        }
+
         private void ROIs_CollectionChanged(
             object? sender,
             System.Collections.Specialized.NotifyCollectionChangedEventArgs e
         ) { }
+
+        /// <summary>
+        /// 覆盖层框通常在图像加载后动态加入，加入时按当前实际缩放校准一次，
+        /// 避免与已缩放的编辑层错位。
+        /// </summary>
+        private void OverlayROIs_CollectionChanged(
+            object? sender,
+            System.Collections.Specialized.NotifyCollectionChangedEventArgs e
+        )
+        {
+            if (e.NewItems is null || _imgActualScale <= 0)
+            {
+                return;
+            }
+
+            foreach (var roi in e.NewItems.OfType<ROI>())
+            {
+                roi.UpdateScale(_imgActualScale);
+            }
+        }
         #endregion
 
         #region 鼠标和键盘事件
@@ -608,6 +704,10 @@ namespace Leaf.Controls.UserControls
                 e.LeftButton != MouseButtonState.Pressed
                 && e.RightButton != MouseButtonState.Pressed
             )
+                return;
+
+            // 结果覆盖层只读：除平移外不响应 ROI 绘制/拖拽
+            if (!ShowROIs && Mode != InteractionMode.Pan)
                 return;
 
             switch (Mode)
@@ -672,7 +772,11 @@ namespace Leaf.Controls.UserControls
         {
             this.CaptureMouse();
 
-            if (_pressKey == Key.LeftCtrl)
+            // 结果覆盖层只读：仅保留平移，屏蔽 ROI 选中/编辑/绘制/取色
+            if (!ShowROIs && Mode != InteractionMode.Pan)
+                return;
+
+            if (ShowROIs && _pressKey == Key.LeftCtrl)
             {
                 var pos = e.GetPosition(_mainPanel);
                 var clickedRoi = ROIs.LastOrDefault(roi => roi.Rect.Contains(pos.X, pos.Y));
@@ -791,6 +895,15 @@ namespace Leaf.Controls.UserControls
         {
             this.ReleaseMouseCapture();
 
+            // 结果覆盖层只读：清理可能残留的绘制/拖拽状态
+            if (!ShowROIs && Mode != InteractionMode.Pan)
+            {
+                _isDrawing = false;
+                _previewRoi = null;
+                _isDraggingRoi = false;
+                return;
+            }
+
             switch (Mode)
             {
                 case InteractionMode.Pan:
@@ -846,7 +959,7 @@ namespace Leaf.Controls.UserControls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (e.Key == Key.Delete && SelectedROI != null)
+            if (e.Key == Key.Delete && SelectedROI != null && ShowROIs)
             {
                 ROIs.Remove(SelectedROI);
                 SelectedROI = null;
@@ -863,7 +976,7 @@ namespace Leaf.Controls.UserControls
 
         private void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if (SelectedROI == null || _imgActualScale == 0)
+            if (!ShowROIs || SelectedROI == null || _imgActualScale == 0)
                 return;
 
             if (e.OriginalSource is not Thumb thumb)
@@ -1081,6 +1194,14 @@ namespace Leaf.Controls.UserControls
             foreach (var roi in ROIs)
             {
                 roi.UpdateScale(scale);
+            }
+
+            if (OverlayROIs is not null)
+            {
+                foreach (var roi in OverlayROIs)
+                {
+                    roi.UpdateScale(scale);
+                }
             }
         }
 
